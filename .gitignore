@@ -11,3 +11,4 @@ notebooks
 campaign_memory.sqlite3
 vector_db/
 *.tmp.sqlite3
+README_dev.md
