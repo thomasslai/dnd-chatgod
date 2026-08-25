@@ -15,8 +15,8 @@ VECTOR_DB_ENC_FILE_NAME = "vector_db.tar.gz.enc"
 # Streamlit / app settings
 # CHAT_* controls the fallback chat engine over lore index.
 CHAT_EMBED_MODEL = "text-embedding-3-small"
-CHAT_MODEL = "gpt-4o-mini"
-CHAT_TEMPERATURE = 1.0
+CHAT_MODEL = "gpt-5.6-luna"
+CHAT_TEMPERATURE = 0.3
 CHAT_SIMILARITY_TOP_K = 15
 # AGENT_* controls the FunctionAgent used when use_agent=true.
 AGENT_MODEL = "gpt-5.6-luna"
@@ -35,6 +35,9 @@ AGENT_EARLY_STOPPING_METHOD = "generate"
 # TOOL_* bounds per-tool output size.
 TOOL_DEFAULT_LIMIT = 16
 TOOL_MAX_LIMIT = 24
+# OVERVIEW_* bounds the whole-campaign summary tool (covers every chapter, not just recent/matched events).
+OVERVIEW_SESSION_LIMIT = 150
+OVERVIEW_CHARS_PER_SESSION = 10000
 # LORE_* controls how much raw lore retrieval context is returned to the agent.
 LORE_RETRIEVER_TOP_K = 14
 LORE_EXCERPT_TOP_K = 10
@@ -60,9 +63,7 @@ CAMPAIGN_DIR = ROOT / "data" / "sorted_data" / "campaign_memory"
 CAMPAIGN_TRANSCRIPT_FILE_NAME = "Timeline von Mountain Madness.docx"
 CAMPAIGN_QUESTS_DIR_NAME = "quests"
 # LLM extractor defaults for entity/claims enrichment.
-CAMPAIGN_ENTITY_MODEL_DEFAULT = "gpt-4o-mini"
-CAMPAIGN_ENTITY_MAX_ENTITIES = 12
-CAMPAIGN_ENTITY_MAX_CLAIMS = 20
+CAMPAIGN_ENTITY_MODEL_DEFAULT = "gpt-5.6-luna"
 # Environment variable names used by ingestion.
 CAMPAIGN_ENTITY_MODEL_ENV = "CAMPAIGN_ENTITY_MODEL"
 CAMPAIGN_ENTITY_API_KEY_ENV = "OPENAI_API_KEY"

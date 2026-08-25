@@ -14,12 +14,14 @@ from settings import (
     LORE_EXCERPT_MAX_CHARS,
     LORE_EXCERPT_TOP_K,
     LORE_RETRIEVER_TOP_K,
+    OVERVIEW_CHARS_PER_SESSION,
+    OVERVIEW_SESSION_LIMIT,
     TOOL_DEFAULT_LIMIT,
     TOOL_MAX_LIMIT,
 )
 
 from .database import connect
-from .queries import get_active_quests, get_recent_events, get_relevant_events
+from .queries import get_active_quests, get_recent_events, get_recent_sections, get_relevant_events
 
 
 logger = logging.getLogger(__name__)
@@ -45,13 +47,14 @@ def get_latest_campaign_events(
     database_path: str = CAMPAIGN_DB_FILE_NAME,
     limit: int = DEFAULT_LIMIT,
 ) -> list[dict[str, Any]]:
-    """Return the newest imported campaign events, newest first."""
+    """Return the newest imported campaign events, ordered oldest to newest."""
     started = time.perf_counter()
     safe_limit = _limit(limit)
     logger.info("campaign tool=get_latest_campaign_events limit=%d", safe_limit)
     connection = connect(Path(database_path))
     try:
-        results = [_event_result(row) for row in get_recent_events(connection, safe_limit)]
+        # SQL fetches newest-first to apply the limit; reverse so the narration reads chronologically.
+        results = [_event_result(row) for row in reversed(get_recent_events(connection, safe_limit))]
         logger.info(
             "campaign tool=get_latest_campaign_events results=%d duration_ms=%.1f",
             len(results),
@@ -147,6 +150,33 @@ def get_active_campaign_quests(
         connection.close()
 
 
+def get_campaign_overview(
+    database_path: str = CAMPAIGN_DB_FILE_NAME,
+) -> list[dict[str, Any]]:
+    """Return a chronological, chapter-by-chapter overview covering the entire campaign."""
+    started = time.perf_counter()
+    logger.info("campaign tool=get_campaign_overview")
+    connection = connect(Path(database_path))
+    try:
+        sections = get_recent_sections(connection, limit=OVERVIEW_SESSION_LIMIT)
+        results = [
+            {
+                "chapter": row["title"],
+                "order_index": row["order_index"],
+                "summary": row["summary"][:OVERVIEW_CHARS_PER_SESSION],
+            }
+            for row in sorted(sections, key=lambda row: row["order_index"])
+        ]
+        logger.info(
+            "campaign tool=get_campaign_overview chapters=%d duration_ms=%.1f",
+            len(results),
+            (time.perf_counter() - started) * 1000,
+        )
+        return results
+    finally:
+        connection.close()
+
+
 def get_lore_search_tool(index: Any) -> FunctionTool:
     """Wrap the existing lore index as a read-only agent tool."""
     retriever = index.as_retriever(similarity_top_k=LORE_RETRIEVER_TOP_K)
@@ -184,6 +214,15 @@ def get_campaign_tools(database_path: str = CAMPAIGN_DB_FILE_NAME) -> list[Funct
         return search_campaign_events(search_input, database_path, limit)
 
     return [
+        FunctionTool.from_defaults(
+            fn=lambda: get_campaign_overview(database_path),
+            name="get_campaign_overview",
+            description=(
+                "Get a chronological overview of every chapter in the campaign, each with a "
+                "concatenated summary of its events. Use this for requests to summarize the "
+                "whole campaign or multiple chapters, since other tools only return partial slices."
+            ),
+        ),
         FunctionTool.from_defaults(
             fn=lambda limit=DEFAULT_LIMIT: get_latest_campaign_events(database_path, limit),
             name="get_latest_campaign_events",

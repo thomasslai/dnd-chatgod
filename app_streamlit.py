@@ -154,7 +154,6 @@ def get_agent():
         api_key = st.secrets[SECRET_OPENAI_API_KEY]
         llm = OpenAI(
             model=AGENT_MODEL,
-            temperature=AGENT_TEMPERATURE,
             reasoning_effort=AGENT_REASONING_EFFORT,
             api_key=api_key,
         )

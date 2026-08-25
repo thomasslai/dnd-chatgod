@@ -143,9 +143,10 @@ def get_campaign_memory_context(
         parts.append("Kampagnen-Memory (neueste Abschnitte):\n" + "\n".join(section_lines))
 
     if recent_events:
+        # recent_events is newest-first (SQL limit window); present chronologically for the prompt.
         event_lines = [
             f"- {row['session_title']}, Ereignis {row['sequence']}: {row['summary'][:300]}"
-            for row in recent_events
+            for row in reversed(recent_events)
         ]
         parts.append("Zuletzt importierte Ereignisse:\n" + "\n".join(event_lines))
 

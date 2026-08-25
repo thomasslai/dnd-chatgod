@@ -28,6 +28,8 @@ Ereignisse oder Quests betrifft. Die Tools sind schreibgeschuetzt.
 
 Regeln:
 - Waehle das passendste Tool und gib nur die benoetigten Argumente an.
+- Nutze get_campaign_overview fuer Zusammenfassungen der gesamten Kampagne oder mehrerer Kapitel.
+- Verlasse dich fuer solche Zusammenfassungen niemals auf get_latest_campaign_events oder search_campaign_events allein, da diese nur begrenzte, neueste bzw. thematisch gefilterte Ausschnitte liefern und fruehere Kapitel auslassen koennen.
 - Nutze get_latest_campaign_events fuer Fragen nach dem letzten oder neuesten Ereignis.
 - Nutze get_latest_campaign_events fuer Fragen nach dem aktuellen Stand der Kampagne.
 - Beantworte aktuelle Kampagnenfragen niemals aus search_lore allein; die Lore kann alte Quest-Snapshots enthalten.
