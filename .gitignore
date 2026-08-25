@@ -1,0 +1,13 @@
+.env
+.streamlit
+.venv
+.venv_app
+data
+docs
+*.ipynb
+__pycache__
+notebooks
+.vscode
+campaign_memory.sqlite3
+vector_db/
+*.tmp.sqlite3
